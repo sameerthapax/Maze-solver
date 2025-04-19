@@ -54,7 +54,7 @@ npm run dev
 ```
 maze-solver-react/
 ├── public/
-│   └── favicon.webp
+│   └── maze.png
 ├── src/
 │   ├── components/
 │   │   ├── MazeSolver.jsx

@@ -61,7 +61,6 @@ maze-solver-react/
 │   ├── algorithms/
 │   │   ├── bfs.js
 │   │   └── backtracking.js
-│   ├── App.jsx
 │   ├── main.jsx
 ├── index.html
 └── package.json

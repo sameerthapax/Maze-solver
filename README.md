@@ -32,7 +32,7 @@ A dynamic and interactive web application that lets you **draw mazes** and visua
 ```bash
 # Clone the repo
 https://github.com/sameerthapax/maze-solver.git
-cd maze-solver
+cd Maze-solver
 
 # Install dependencies
 npm install

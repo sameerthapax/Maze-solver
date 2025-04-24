@@ -1,10 +1,12 @@
-// React-based Maze Solver with Backtracking and BFS
-// Modern UI + Responsive Grid Layout
 
 import React, { useRef, useState, useEffect } from 'react';
 import './MazeSolver.css';
 import solveMazeBFS from '../algorithms/bfs.js';
 import solveMazeBacktracking from '../algorithms/backtracking.js';
+import solveMazeAstar from '../algorithms/astart.js';
+import solveMazeDijkstra from '../algorithms/dijkstra.js';
+
+
 
 const ROWS = 20;
 const COLS = 20;
@@ -97,8 +99,12 @@ const MazeSolver = () => {
         if (!start || !end) return;
         if (algorithm === 'bfs') {
             solveMazeBFS(grid, setGrid, start, end, setSteps, setTime, delay);
-        } else {
+        } else if (algorithm === 'backtracking') {
             solveMazeBacktracking(grid, setGrid, start, end, setSteps, setTime, delay);
+        } else if (algorithm === 'astar') {
+            solveMazeAstar(grid, setGrid, start, end, setSteps, setTime, delay);
+        } else if (algorithm === 'dijkstra') {
+            solveMazeDijkstra(grid, setGrid, start, end, setSteps, setTime, delay);
         }
     };
 
@@ -134,9 +140,12 @@ const MazeSolver = () => {
                 <button className={getButtonClass('erase')} onClick={() => setMode('erase')}>🧼 Erase</button>
                 <button className={getButtonClass('start')} onClick={() => setMode('start')}>🟢 Start</button>
                 <button className={getButtonClass('end')} onClick={() => setMode('end')}>🔵 End</button>
-                <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)} style={{ padding: '8px', borderRadius: '6px' }}>
+                <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)}
+                        style={{padding: '8px', borderRadius: '6px', width:'12vw', fontSize:'0.85vw'}}>
                     <option value="bfs">🔍 Breadth-First Search</option>
                     <option value="backtracking">🧭 Backtracking</option>
+                    <option value="astar">⭐ A*</option>
+                    <option value="dijkstra">📏 Dijkstra</option>
                 </select>
                 <button onClick={solveMaze}>🚀 Solve</button>
                 <button onClick={resetGrid}>🗑️ Reset Grid</button>

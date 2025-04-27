@@ -28,23 +28,53 @@ const MazeSolver = () => {
         const ctx = canvasRef.current.getContext('2d');
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLS; j++) {
-                ctx.fillStyle =
-                    grid[i][j] === 1 ? '#2d3436' :
-                        grid[i][j] === 2 ? '#00b894' :
-                            grid[i][j] === 3 ? '#0984e3' :
-                                grid[i][j] === 4 ? '#ffeaa7' :
-                                    grid[i][j] === 5 ? '#d63031' : '#f5f6fa';
+                // Set neon colors and glow
+                if (grid[i][j] === 1) { // Wall
+                    ctx.fillStyle = '#ff00cc';
+                    ctx.shadowColor = '#ff00cc';
+                    ctx.shadowBlur = 14;
+                } else if (grid[i][j] === 2) { // Start
+                    ctx.fillStyle = '#39ff14';
+                    ctx.shadowColor = '#39ff14';
+                    ctx.shadowBlur = 18;
+                } else if (grid[i][j] === 3) { // End
+                    ctx.fillStyle = '#00f6ff';
+                    ctx.shadowColor = '#00f6ff';
+                    ctx.shadowBlur = 18;
+                } else if (grid[i][j] === 4) { // Path
+                    ctx.fillStyle = '#ffff33';
+                    ctx.shadowColor = '#ffff33';
+                    ctx.shadowBlur = 12;
+                } else if (grid[i][j] === 5) { // Visited
+                    ctx.fillStyle = '#bc13fe';
+                    ctx.shadowColor = '#bc13fe';
+                    ctx.shadowBlur = 10;
+                } else {
+                    ctx.fillStyle = '#10111a'; // Empty
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                }
                 ctx.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                ctx.strokeStyle = '#dfe6e9';
+                ctx.strokeStyle = '#222c'; // faint neon grid border
                 ctx.strokeRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                // Optionally reset shadowBlur for next cell (some browsers require)
+                // ctx.shadowBlur = 0;
             }
         }
+        ctx.shadowBlur = 0; // Reset shadowBlur after drawing
     };
 
     const handleClick = (e) => {
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / CELL_SIZE);
-        const y = Math.floor((e.clientY - rect.top) / CELL_SIZE);
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+
+        // Get mouse coordinates relative to the page, adjusted for scroll
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        // Scale the mouse coordinates
+        const x = Math.floor((e.clientX - rect.left) * scaleX / CELL_SIZE);
+        const y = Math.floor((e.clientY - rect.top) * scaleY / CELL_SIZE);
 
         const newGrid = grid.map((row, i) =>
             row.map((cell, j) => {
@@ -127,21 +157,22 @@ const MazeSolver = () => {
         mode === type ? 'mode-button selected' : 'mode-button';
 
     return (
-        <div className="maze-container" style={{ padding: '2rem', maxWidth: '960px', margin: '0 auto' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '1.5rem', color: '#2d3436' }}>🧩 Maze Solver</h2>
+        <div className="maze-container">
+            <h2>🧩 Maze Solver </h2>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-                gap: '12px',
-                marginBottom: '24px'
-            }}>
-                <button className={getButtonClass('wall')} onClick={() => setMode('wall')}>🧱 Wall</button>
-                <button className={getButtonClass('erase')} onClick={() => setMode('erase')}>🧼 Erase</button>
+            <div className="controls"
+                 style={{
+                     display: 'flex',
+                     flexWrap: 'wrap',
+                     gap: '10px',
+                     justifyContent: 'center',
+                     marginBottom: '20px',
+                 }}>
+                <button className={getButtonClass('wall')} onClick={() => setMode('wall')}>🟫 Wall</button>
+                <button className={getButtonClass('erase')} onClick={() => setMode('erase')}>✖️ Erase</button>
                 <button className={getButtonClass('start')} onClick={() => setMode('start')}>🟢 Start</button>
                 <button className={getButtonClass('end')} onClick={() => setMode('end')}>🔵 End</button>
-                <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)}
-                        style={{padding: '8px', borderRadius: '6px', width:'12vw', fontSize:'0.85vw'}}>
+                <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)}>
                     <option value="bfs">🔍 Breadth-First Search</option>
                     <option value="backtracking">🧭 Backtracking</option>
                     <option value="astar">⭐ A*</option>
@@ -153,20 +184,17 @@ const MazeSolver = () => {
                 <button onClick={generateRandomMaze}>🎲 Generate Maze</button>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
-                <canvas
-                    ref={canvasRef}
-                    width={COLS * CELL_SIZE}
-                    height={ROWS * CELL_SIZE}
-                    onClick={handleClick}
-                    className="maze-canvas"
-                    style={{ maxWidth: '100%', borderRadius: '8px', border: '2px solid #dfe6e9', display: 'block', margin: '0 auto' }}
-                />
-            </div>
+            <canvas
+                ref={canvasRef}
+                width={COLS * CELL_SIZE}
+                height={ROWS * CELL_SIZE}
+                onClick={handleClick}
+                className="maze-canvas"
+            />
 
-            <div className="stats" style={{ textAlign: 'center', marginTop: '1.5rem', color: '#2d3436', fontSize: '1.1rem' }}>
-                <p>🧮 Steps: {steps}</p>
-                <p>⏱️ Time Taken: {time}s</p>
+            <div className="stats">
+                <p>🧮 Steps: <span style={{color:'#fff'}}>{steps}</span></p>
+                <p>⏱️ Time Taken: <span style={{color:'#fff'}}>{time}s</span></p>
             </div>
         </div>
     );
